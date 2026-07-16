@@ -4,11 +4,27 @@
 #include <cstdint>
 #include <iostream>
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
+namespace {
+void configureConsoleUtf8() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+}
+}
+
 int main() {
+    configureConsoleUtf8();
+
     const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     Game game(static_cast<std::uint32_t>(now));
 
-    std::cout << "\nКоманды: w/a/s/d — идти, x — магия, h — кекс, n — новый забег, q — выход.\n";
+    std::cout << "\nКоманды: w/a/s/d - идти, x - магия, h - кекс, n - новый забег, q - выход.\n";
 
     char command = 0;
     while (game.isRunning() && std::cin >> command) {
