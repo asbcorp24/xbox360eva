@@ -14,8 +14,14 @@ public:
     void beginFrame();
     void drawCube(const CubeInstance& cube, const Mat4& viewProjection);
     void endFrame();
+
 private:
+    Mat4 makeWorld(const CubeInstance& cube) const;
+
     XenosDevice xe_{};
     XenosVertexBuffer* vertexBuffer_{};
     XenosIndexBuffer* indexBuffer_{};
+    XenosShader vertexShader_{};
+    XenosShader pixelShader_{};
+    bool shadersReady_{false};
 };
