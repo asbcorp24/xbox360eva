@@ -1,0 +1,33 @@
+.SUFFIXES:
+
+ifeq ($(strip $(DEVKITXENON)),)
+$(error DEVKITXENON is not set. Point it to the LibXenon/devkitPPC toolchain)
+endif
+
+include $(DEVKITXENON)/rules
+
+TARGET := eva_pink_kingdom
+BUILD := build-xenon
+SOURCES := platform/xenon
+INCLUDES := platform/xenon src
+CXXFLAGS += -O2 -Wall -ffunction-sections -fdata-sections -std=gnu++17
+LDFLAGS += -Wl,--gc-sections
+
+CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+OFILES := $(CPPFILES:.cpp=.o)
+VPATH := $(SOURCES)
+
+.PHONY: all clean
+all: $(BUILD) $(TARGET).elf
+
+$(BUILD):
+	mkdir -p $(BUILD)
+
+$(TARGET).elf: $(addprefix $(BUILD)/,$(OFILES))
+	$(CXX) $(LDFLAGS) $^ -o $@ -lxenon -lm
+
+$(BUILD)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(addprefix -I,$(INCLUDES)) -c $< -o $@
+
+clean:
+	rm -rf $(BUILD) $(TARGET).elf
