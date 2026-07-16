@@ -10,6 +10,7 @@ TARGET := eva_pink_kingdom
 BUILD := build-xenon
 SOURCES := platform/xenon
 INCLUDES := platform/xenon src
+SHADER_HEADER := platform/xenon/GeneratedCubeShaders.h
 CXXFLAGS += -O2 -Wall -ffunction-sections -fdata-sections -std=gnu++17
 LDFLAGS += -Wl,--gc-sections
 
@@ -17,8 +18,13 @@ CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 OFILES := $(CPPFILES:.cpp=.o)
 VPATH := $(SOURCES)
 
-.PHONY: all clean
-all: $(BUILD) $(TARGET).elf
+.PHONY: all clean shaders
+all: shaders $(BUILD) $(TARGET).elf
+
+shaders: $(SHADER_HEADER)
+
+$(SHADER_HEADER): tools/extract_libxenon_cube_shaders.py
+	python3 tools/extract_libxenon_cube_shaders.py
 
 $(BUILD):
 	mkdir -p $(BUILD)
@@ -26,8 +32,10 @@ $(BUILD):
 $(TARGET).elf: $(addprefix $(BUILD)/,$(OFILES))
 	$(CXX) $(LDFLAGS) $^ -o $@ -lxenon -lm
 
+$(BUILD)/XenonRenderer.o: $(SHADER_HEADER)
+
 $(BUILD)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(addprefix -I,$(INCLUDES)) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD) $(TARGET).elf
+	rm -rf $(BUILD) $(TARGET).elf $(SHADER_HEADER)
