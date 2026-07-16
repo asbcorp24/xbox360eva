@@ -14,7 +14,7 @@ add_executable(eva_pink_kingdom
 target_include_directories(eva_pink_kingdom PRIVATE src)
 
 if(MSVC)
-    target_compile_options(eva_pink_kingdom PRIVATE /W4 /permissive-)
+    target_compile_options(eva_pink_kingdom PRIVATE /W4 /permissive- /utf-8)
 else()
     target_compile_options(eva_pink_kingdom PRIVATE -Wall -Wextra -Wpedantic)
 endif()
